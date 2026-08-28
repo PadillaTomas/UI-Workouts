@@ -9,7 +9,3 @@ DerivedData/
 
 # Snapshot test diffs written on failure (references in __Snapshots__/ ARE committed)
 **/__Snapshots__/**/*.failure.png
-
-# CI workflow staged locally at .github/workflows/ci.yml — add it via GitHub
-# once your token has the "workflow" scope (see README).
-.github/workflows/
