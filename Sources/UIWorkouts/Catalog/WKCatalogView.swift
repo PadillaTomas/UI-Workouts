@@ -30,6 +30,7 @@ struct WKCatalogContent: View {
                 WKButton("Start session", style: .primary, size: .large) {}
                 WKButton("Mark done", style: .secondary) {}
                 WKButton("Pause", style: .soft) {}
+                WKButton("Reset", style: .destructive) {}
                 HStack {
                     WKButton("Skip", style: .quiet, size: .compact) {}
                     WKButton("Loading", isLoading: true) {}
