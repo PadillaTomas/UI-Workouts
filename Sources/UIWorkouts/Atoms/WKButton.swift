@@ -4,14 +4,29 @@ import SwiftUI
 ///
 /// - `primary`     filled, inverted text — the one main action on a screen.
 /// - `secondary`   surface fill + hairline border.
-/// - `soft`        tinted fill (used for "Pause" — `WKPhase.run.softColor`).
+/// - `soft`        tinted fill in `WKPhase.run.softColor` — a shorthand for
+///                 `.softPhase(.run)`, kept for the common case.
+/// - `softPhase(_)` tinted fill in the given phase's soft colour — a "Pause"
+///                 button on a timer that changes phase.
 /// - `quiet`       text only, secondary color — low-stakes ("Skip for now").
 /// - `destructive` text only, `WKColor.danger` — reset, delete.
 ///
 /// States shipped: rest, pressed (0.97 scale, 0.9 opacity), disabled (40%),
 /// loading (spinner replaces the label, control still sized).
 public struct WKButton<Label: View>: View {
-    public enum Style { case primary, secondary, soft, quiet, destructive }
+    public enum Style: Equatable {
+        case primary, secondary, soft, quiet, destructive
+        case softPhase(WKPhase)
+
+        /// The phase whose soft colours this style uses, if any.
+        var softTone: WKPhase? {
+            switch self {
+            case .soft: return .run
+            case .softPhase(let phase): return phase
+            default: return nil
+            }
+        }
+    }
 
     public enum Size {
         /// 64pt — timer controls / hero CTA.
@@ -83,21 +98,26 @@ public struct WKButton<Label: View>: View {
     private var isTextOnly: Bool { style == .quiet || style == .destructive }
 
     private var foreground: Color {
+        if let tone = style.softTone { return tone.onSoftColor }
         switch style {
         case .primary: return WKColor.bg
         case .secondary: return WKColor.textPrimary
-        case .soft: return WKPhase.run.onSoftColor
         case .quiet: return WKColor.textSecondary
         case .destructive: return WKColor.danger
+        case .soft, .softPhase: return WKColor.textPrimary   // unreachable — handled above
         }
     }
 
     @ViewBuilder private var background: some View {
-        switch style {
-        case .primary: WKColor.textPrimary
-        case .secondary: WKColor.surface
-        case .soft: WKPhase.run.softColor
-        case .quiet, .destructive: Color.clear
+        if let tone = style.softTone {
+            tone.softColor
+        } else {
+            switch style {
+            case .primary: WKColor.textPrimary
+            case .secondary: WKColor.surface
+            case .quiet, .destructive: Color.clear
+            case .soft, .softPhase: Color.clear   // unreachable — handled above
+            }
         }
     }
 
@@ -140,6 +160,7 @@ struct WKPressStyle: ButtonStyle {
         WKButton("Start session", style: .primary, size: .large) {}
         WKButton("Mark done", style: .secondary) {}
         WKButton("Pause", style: .soft) {}
+        WKButton("Pause (walk)", style: .softPhase(.walk)) {}
         WKButton("Skip for now", style: .quiet, size: .compact) {}
         WKButton("Reset", style: .destructive) {}
         WKButton("Loading", style: .primary, isLoading: true) {}

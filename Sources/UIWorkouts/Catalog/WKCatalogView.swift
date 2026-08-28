@@ -30,6 +30,7 @@ struct WKCatalogContent: View {
                 WKButton("Start session", style: .primary, size: .large) {}
                 WKButton("Mark done", style: .secondary) {}
                 WKButton("Pause", style: .soft) {}
+                WKButton("Pause (walk)", style: .softPhase(.walk)) {}
                 WKButton("Reset", style: .destructive) {}
                 HStack {
                     WKButton("Skip", style: .quiet, size: .compact) {}
@@ -59,6 +60,10 @@ struct WKCatalogContent: View {
             }
             group("Segmented track") {
                 WKSegmentedTrack(segments: sampleSegments)
+            }
+            group("Interval groups") {
+                WKIntervalGroup(runSeconds: 60, walkSeconds: 60, repeatCount: 10)
+                WKIntervalGroup(runSeconds: 3000, walkSeconds: nil, repeatCount: 1)
             }
             group("Interval rows") {
                 WKIntervalRow(phase: .run, title: "Run", subtitle: "conversation pace",
