@@ -15,22 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_26.app
-
+      # The macos-26 runner already defaults to Xcode 26.x — just record which.
       - name: Show toolchain
         run: |
           xcodebuild -version
           xcrun simctl list runtimes | grep iOS
 
-      # Pure-logic tests — fast, run on the host.
       - name: swift test (logic)
         run: swift test
 
-      # Visual-regression tests against the committed reference PNGs.
-      # Reference images were recorded on iOS 26.5; if the runner ships a
-      # different iOS the diff may fail on sub-pixel rendering — regenerate
-      # locally with SNAPSHOT_RECORD=1 and commit.
       - name: xcodebuild test (snapshots)
         run: |
           set -o pipefail
@@ -41,7 +34,6 @@ jobs:
             -resultBundlePath TestResults.xcresult \
             | xcbeautify
 
-      # Prove the library still compiles for a real iOS target.
       - name: xcodebuild build (iOS library)
         run: |
           set -o pipefail
