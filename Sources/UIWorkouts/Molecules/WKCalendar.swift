@@ -98,44 +98,113 @@ public struct WKDayCell: View {
 
 /// Layer 2 — a month grid. `leadingBlanks` shifts the first day to its weekday
 /// column. Weekday header symbols are supplied by the caller (locale is the
-/// app's concern, not the package's).
+/// app's concern, not the package's). Pass `onStep` to get prev/next month
+/// chevrons beside the title; pass `onSelect` to make the day cells tappable.
 public struct WKMonthGrid: View {
     private let monthTitle: String
     private let weekdaySymbols: [String]
     private let leadingBlanks: Int
     private let days: [WKDay]
+    private let selection: Int?
+    private let onStep: ((Int) -> Void)?
+    private let onSelect: ((WKDay) -> Void)?
 
     public init(
         monthTitle: String,
         weekdaySymbols: [String],
         leadingBlanks: Int,
-        days: [WKDay]
+        days: [WKDay],
+        selection: Int? = nil,
+        onStep: ((Int) -> Void)? = nil,
+        onSelect: ((WKDay) -> Void)? = nil
     ) {
         self.monthTitle = monthTitle
         self.weekdaySymbols = weekdaySymbols
         self.leadingBlanks = max(0, leadingBlanks)
         self.days = days
+        self.selection = selection
+        self.onStep = onStep
+        self.onSelect = onSelect
     }
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: WKSpace.sm), count: 7)
 
     public var body: some View {
         VStack(alignment: .leading, spacing: WKSpace.md) {
-            Text(monthTitle)
-                .wkFont(.titleL)
-                .foregroundStyle(WKColor.textPrimary)
-            LazyVGrid(columns: columns, spacing: WKSpace.sm) {
-                ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
-                    Text(symbol)
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(WKColor.textTertiary)
+            HStack {
+                Text(monthTitle)
+                    .wkFont(.titleL)
+                    .foregroundStyle(WKColor.textPrimary)
+                if let onStep {
+                    Spacer(minLength: WKSpace.md)
+                    HStack(spacing: WKSpace.lg) {
+                        stepButton("chevron.left", -1, onStep)
+                        stepButton("chevron.right", 1, onStep)
+                    }
                 }
-                ForEach(0..<leadingBlanks, id: \.self) { _ in Color.clear.frame(height: 1) }
-                ForEach(days) { day in
-                    WKDayCell(day: day.day, state: day.state)
+            }
+            LazyVGrid(columns: columns, spacing: WKSpace.sm) {
+                ForEach(gridCells) { cell in
+                    switch cell {
+                    case let .header(_, symbol):
+                        Text(symbol)
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(WKColor.textTertiary)
+                    case .blank:
+                        Color.clear.frame(height: 1)
+                    case let .day(day):
+                        dayCell(day)
+                    }
                 }
             }
         }
+    }
+
+    private enum GridCell: Identifiable {
+        case header(Int, String)
+        case blank(Int)
+        case day(WKDay)
+        var id: String {
+            switch self {
+            case let .header(i, _): return "h\(i)"
+            case let .blank(i): return "b\(i)"
+            case let .day(day): return "d\(day.id)"
+            }
+        }
+    }
+
+    private var gridCells: [GridCell] {
+        weekdaySymbols.enumerated().map { GridCell.header($0.offset, $0.element) }
+            + (0..<leadingBlanks).map { GridCell.blank($0) }
+            + days.map { GridCell.day($0) }
+    }
+
+    @ViewBuilder private func dayCell(_ day: WKDay) -> some View {
+        let cell = WKDayCell(day: day.day, state: day.state)
+            .overlay {
+                if day.day == selection {
+                    RoundedRectangle(cornerRadius: WKRadius.cell, style: .continuous)
+                        .strokeBorder(WKColor.accent, lineWidth: 2)
+                }
+            }
+        if let onSelect {
+            Button { onSelect(day) } label: { cell }
+                .buttonStyle(WKPressStyle())
+        } else {
+            cell
+        }
+    }
+
+    private func stepButton(_ symbol: String, _ delta: Int,
+                            _ onStep: @escaping (Int) -> Void) -> some View {
+        Button { onStep(delta) } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(WKColor.textSecondary)
+                .frame(width: WKSize.minTarget, height: WKSize.minTarget)
+        }
+        .buttonStyle(WKPressStyle())
+        .accessibilityLabel(delta < 0 ? "Previous month" : "Next month")
     }
 }
 

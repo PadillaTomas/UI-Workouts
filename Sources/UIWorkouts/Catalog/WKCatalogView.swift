@@ -72,6 +72,9 @@ struct WKCatalogContent: View {
                               seconds: 90, state: .done)
             }
             group("Calendar") {
+                WKMonthGrid(monthTitle: "September", weekdaySymbols: ["M","T","W","T","F","S","S"], leadingBlanks: 0, days: sampleDays, selection: 9, onStep: { _ in }, onSelect: { _ in })
+            }
+            group("Calendar (static)") {
                 WKMonthGrid(monthTitle: "September",
                             weekdaySymbols: ["M", "T", "W", "T", "F", "S", "S"],
                             leadingBlanks: 0, days: sampleDays)
