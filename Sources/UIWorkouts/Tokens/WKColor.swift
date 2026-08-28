@@ -4,7 +4,7 @@ import SwiftUI
 /// Transcribed from the "Couch to Hour iOS design" canvas (section 1a).
 ///
 /// These are the only colors the system uses. Saturated hues appear solely
-/// through ``WKPhase`` and ``stateDone``.
+/// through ``WKPhase``, ``stateDone`` and ``danger``.
 public enum WKColor {
     /// App background. `#FAF8F5` / `#171614`
     public static let bg = Color(light: 0xFAF8F5, dark: 0x171614)
@@ -26,4 +26,8 @@ public enum WKColor {
     public static let accent = Color(light: 0xC4703C, dark: 0xE08A52)
     /// "Completed" state. `#5B7A55` / `#8FAE87`
     public static let stateDone = Color(light: 0x5B7A55, dark: 0x8FAE87)
+    /// Destructive actions (reset, delete). A muted brick red — reads as a
+    /// warning without clashing with the warm palette or the ``accent`` orange.
+    /// `#B23B3B` / `#E38A82`
+    public static let danger = Color(light: 0xB23B3B, dark: 0xE38A82)
 }

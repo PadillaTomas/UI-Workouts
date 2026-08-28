@@ -118,6 +118,7 @@ struct WKCatalogContent: View {
         let swatches: [(String, Color)] = [
             ("bg", WKColor.bg), ("surface", WKColor.surface), ("sunken", WKColor.surfaceSunken),
             ("text", WKColor.textPrimary), ("accent", WKColor.accent), ("done", WKColor.stateDone),
+            ("danger", WKColor.danger),
             ("run", WKPhase.run.color), ("walk", WKPhase.walk.color)
         ]
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4),

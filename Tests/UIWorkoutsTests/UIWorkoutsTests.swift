@@ -56,6 +56,12 @@ struct TokenTests {
         #expect(WKPhase.run.softColor != WKPhase.run.color)
     }
 
+    @Test("danger is its own role, distinct from accent and done")
+    func danger() {
+        #expect(WKColor.danger != WKColor.accent)
+        #expect(WKColor.danger != WKColor.stateDone)
+    }
+
     @Test("theme mode maps to color scheme")
     func theme() {
         #expect(WKThemeMode.system.colorScheme == nil)
