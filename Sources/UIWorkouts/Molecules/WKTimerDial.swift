@@ -41,6 +41,8 @@ public struct WKTimerDial: View {
                     .foregroundStyle(phase.onSoftColor)
                 WKTimeText(seconds: seconds, size: .display)
                     .foregroundStyle(WKColor.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             .padding(WKSpace.xxl)
         }

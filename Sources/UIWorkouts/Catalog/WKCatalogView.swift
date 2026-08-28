@@ -54,7 +54,7 @@ struct WKCatalogContent: View {
             group("Timer dial") {
                 WKTimerDial(fraction: 0.34, phase: .run,
                             caption: "You should still be able to talk.", seconds: 154)
-                    .frame(width: 260, height: 260)
+                    .frame(width: 280, height: 280)
             }
             group("Segmented track") {
                 WKSegmentedTrack(segments: sampleSegments)
