@@ -48,19 +48,62 @@ struct SomeScreen: View {
 }
 ```
 
-Preview the whole system: open `WKCatalogView` in Xcode Previews (light + dark presets in
-`WKCatalogView.swift`).
+## Browsing the components
+
+Three ways, increasing fidelity:
+
+1. **Xcode Previews** — every component file has a `#Preview`; `WKCatalogView.swift` has
+   light + dark gallery presets. This is the day-to-day tool (≈ Storybook).
+2. **Demo app** — `Demo/Catalog.xcodeproj`, an iPhone/iPad app that hosts `WKCatalogView`
+   with a theme switcher. Run it to click through on a real simulator or device.
+   It references the package by local path, so it always tracks your working copy.
+3. **Snapshot tests** — see below.
 
 ## Development
 
 ```
 swift build            # host build
-swift test             # unit tests (formatting, weight math, tokens)
-xcodebuild -scheme UIWorkouts -destination 'generic/platform=iOS Simulator' build
+swift test             # pure-logic tests (formatting, weight math, tokens) — host
 ```
 
 macOS is a supported platform *only* so `swift build` / `swift test` run on the host. The
 design system targets iOS 17+.
+
+### Visual-regression (snapshot) tests
+
+`Tests/UIWorkoutsSnapshotTests` renders `WKCatalogView` across a matrix of
+**width × orientation × light/dark × Dynamic Type** and diffs the pixels against the
+committed reference PNGs in `__Snapshots__/`. This is the gate that catches "a padding
+change silently broke dark mode".
+
+```
+# verify (what CI runs)
+xcodebuild test -scheme UIWorkouts -only-testing:UIWorkoutsSnapshotTests \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
+
+# regenerate references after an INTENTIONAL visual change, then review + commit the PNGs
+SNAPSHOT_RECORD=1 xcodebuild test -scheme UIWorkouts -only-testing:UIWorkoutsSnapshotTests \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
+```
+
+References were recorded on **iOS 26.5**. A different iOS runtime can fail on sub-pixel
+font rendering — regenerate on the target runtime if you bump it. `.github/workflows/ci.yml`
+runs logic tests + snapshot tests + an iOS build on every push and PR.
+
+### Pre-tag checklist
+
+```
+swift test
+xcodebuild test -scheme UIWorkouts -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
+```
+Green on both → safe to `git tag x.y.z && git push --tags`.
+
+## Known gaps
+
+- **Dynamic Type**: `WKFont` uses fixed point sizes, so text does not yet scale with the
+  user's content-size setting (the `dynamic-a11y` snapshot is the baseline for when it
+  does). Timer digits already cap at XL by design.
+- **Fonts**: real DM Sans / DM Mono not bundled — see [`FONTS.md`](FONTS.md).
 
 ## Consuming this package
 
