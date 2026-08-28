@@ -2,15 +2,16 @@ import SwiftUI
 
 /// Layer 1 — the system button.
 ///
-/// - `primary`   filled, inverted text — the one main action on a screen.
-/// - `secondary` surface fill + hairline border.
-/// - `soft`      tinted fill (used for "Pause" — `WKPhase.run.softColor`).
-/// - `quiet`     text only, secondary color — low-stakes ("Skip for now").
+/// - `primary`     filled, inverted text — the one main action on a screen.
+/// - `secondary`   surface fill + hairline border.
+/// - `soft`        tinted fill (used for "Pause" — `WKPhase.run.softColor`).
+/// - `quiet`       text only, secondary color — low-stakes ("Skip for now").
+/// - `destructive` text only, `WKColor.danger` — reset, delete.
 ///
 /// States shipped: rest, pressed (0.97 scale, 0.9 opacity), disabled (40%),
 /// loading (spinner replaces the label, control still sized).
 public struct WKButton<Label: View>: View {
-    public enum Style { case primary, secondary, soft, quiet }
+    public enum Style { case primary, secondary, soft, quiet, destructive }
 
     public enum Size {
         /// 64pt — timer controls / hero CTA.
@@ -63,9 +64,9 @@ public struct WKButton<Label: View>: View {
                         .tint(foreground)
                 }
             }
-            .frame(maxWidth: style == .quiet ? nil : .infinity)
+            .frame(maxWidth: isTextOnly ? nil : .infinity)
             .frame(height: size.height)
-            .padding(.horizontal, style == .quiet ? WKSpace.sm : WKSpace.lg)
+            .padding(.horizontal, isTextOnly ? WKSpace.sm : WKSpace.lg)
             .foregroundStyle(foreground)
             .background(background)
             .overlay(border)
@@ -78,12 +79,16 @@ public struct WKButton<Label: View>: View {
         .accessibilityAddTraits(isLoading ? .updatesFrequently : [])
     }
 
+    /// Text-only styles hug their label instead of filling the width.
+    private var isTextOnly: Bool { style == .quiet || style == .destructive }
+
     private var foreground: Color {
         switch style {
         case .primary: return WKColor.bg
         case .secondary: return WKColor.textPrimary
         case .soft: return WKPhase.run.onSoftColor
         case .quiet: return WKColor.textSecondary
+        case .destructive: return WKColor.danger
         }
     }
 
@@ -92,7 +97,7 @@ public struct WKButton<Label: View>: View {
         case .primary: WKColor.textPrimary
         case .secondary: WKColor.surface
         case .soft: WKPhase.run.softColor
-        case .quiet: Color.clear
+        case .quiet, .destructive: Color.clear
         }
     }
 
@@ -136,6 +141,7 @@ struct WKPressStyle: ButtonStyle {
         WKButton("Mark done", style: .secondary) {}
         WKButton("Pause", style: .soft) {}
         WKButton("Skip for now", style: .quiet, size: .compact) {}
+        WKButton("Reset", style: .destructive) {}
         WKButton("Loading", style: .primary, isLoading: true) {}
         WKButton("Disabled", style: .primary) {}.disabled(true)
     }
