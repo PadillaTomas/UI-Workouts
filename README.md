@@ -110,7 +110,6 @@ Green on all → safe to `git tag x.y.z && git push --tags`.
 - **Dynamic Type**: `WKFont` uses fixed point sizes, so text does not yet scale with the
   user's content-size setting (the `dynamic-a11y` snapshot is the baseline for when it
   does). Timer digits already cap at XL by design.
-- **Fonts**: real DM Sans / DM Mono not bundled — see [`FONTS.md`](FONTS.md).
 
 ## Consuming this package
 
@@ -123,4 +122,4 @@ In an app's `Package.swift` (or Xcode → Add Package Dependencies):
 then add `"UIWorkouts"` to the target's dependencies and `import UIWorkouts`.
 Releases are git tags (`git tag 0.1.0 && git push --tags`); bump per semver.
 
-See [`FONTS.md`](FONTS.md) for the one open asset item.
+DM Sans / DM Mono are bundled and self-register — see [`FONTS.md`](FONTS.md).

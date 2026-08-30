@@ -17,7 +17,10 @@ let package = Package(
         .library(name: "UIWorkouts", targets: ["UIWorkouts"])
     ],
     targets: [
-        .target(name: "UIWorkouts"),
+        .target(
+            name: "UIWorkouts",
+            resources: [.process("Resources")]
+        ),
         // Pure-logic tests. Run on the host: `swift test`.
         .testTarget(
             name: "UIWorkoutsTests",

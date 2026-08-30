@@ -3,10 +3,11 @@ import SwiftUI
 /// Layer 0 — the type scale (canvas section 1a).
 ///
 /// The design specifies **DM Sans** (text) and **DM Mono** (timer + mono labels).
-/// Until the `.ttf` files are dropped into `Resources/Fonts/` and registered,
-/// these resolve to the system faces: `.default` for text and `.monospaced`
-/// for the timer/mono styles, always with `.monospacedDigit()` where the design
-/// calls for tabular figures. Swapping in the real faces later needs no API change.
+/// Both are bundled (`Resources/Fonts/`) and registered on first use
+/// (``WKFontRegistration``); a consuming app needs no `UIAppFonts` entry.
+/// Sizes are still *fixed* (`Font.custom(_:fixedSize:)`) — Dynamic Type scaling
+/// is a separate change. `.monospacedDigit()` is kept everywhere the design
+/// calls for tabular figures.
 public enum WKFont: CaseIterable, Sendable {
     /// Big timer readout. Mono 92, tight tracking, tabular, cap at Dynamic Type XL.
     case timerDisplay
@@ -65,7 +66,20 @@ public enum WKFont: CaseIterable, Sendable {
         var dynamicTypeCap: DynamicTypeSize?
 
         var font: Font {
-            .system(size: size, weight: weight, design: mono ? .monospaced : .default)
+            _ = WKFontRegistration.run
+            if mono {
+                // DM Mono ships as separate static faces — address by PostScript
+                // name (Light / Medium have their own family names).
+                let face: String
+                switch weight {
+                case .light, .ultraLight, .thin: face = "DMMono-Light"
+                case .medium, .semibold, .bold, .heavy, .black: face = "DMMono-Medium"
+                default: face = "DMMono-Regular"
+                }
+                return .custom(face, fixedSize: size)
+            }
+            // DM Sans is the variable face — `.weight` drives the `wght` axis.
+            return .custom("DM Sans", fixedSize: size).weight(weight)
         }
     }
 }

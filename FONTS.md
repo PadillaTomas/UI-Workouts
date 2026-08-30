@@ -1,26 +1,29 @@
-# Fonts — the one open asset item
+# Fonts
 
 The design specifies **DM Sans** (text) and **DM Mono** (timer + mono labels), both
-SIL OFL, available from Google Fonts.
+SIL OFL.
 
-## Current state
+## Current state — the real faces are in
 
-`WKFont` resolves to the **system faces** as a faithful fallback:
+Bundled under `Sources/UIWorkouts/Resources/Fonts/` and registered with Core Text on
+first `WKFont` use (`WKFontRegistration`) — **a consuming app needs no `UIAppFonts`
+entry and no launch call.**
 
-- text styles → `.system(size:weight:)` (San Francisco)
-- `timerDisplay` / `timerSecondary` / `labelMono` → `.system(..., design: .monospaced)`
-  with `.monospacedDigit()` for the tabular figures the timer needs
+- `DMSans.ttf` — the variable face (`opsz` + `wght` axes). `WKFont` addresses it by
+  the typographic family name `"DM Sans"`; `.weight(_:)` drives the `wght` axis, so
+  every weight a component asks for resolves from the one file.
+- `DMMono-Light.ttf` / `DMMono-Regular.ttf` / `DMMono-Medium.ttf` — DM Mono ships as
+  separate static faces with their own family names, so `WKFont` addresses them by
+  PostScript name (`DMMono-Light` etc.).
+- `OFL-DMSans.txt` / `OFL-DMMono.txt` — the licenses ship with the fonts, as OFL requires.
 
-This renders correctly today — the real faces are a visual refinement, not a blocker.
+`WKFont.Spec.font` uses `Font.custom(_:fixedSize:)`, matching the previous
+**non-scaling** behaviour — Dynamic Type is still a separate change.
+`.monospacedDigit()` is kept everywhere the design calls for tabular figures.
 
-## Switching to the real faces (no API change)
+Everything downstream (`.wkFont(_:)`, every component) is unchanged — no API change.
 
-1. Add the `.ttf` files to a new `Sources/UIWorkouts/Resources/Fonts/` folder:
-   `DMSans-Regular.ttf`, `DMSans-Medium.ttf`, `DMSans-Bold.ttf`,
-   `DMMono-Light.ttf`, `DMMono-Regular.ttf`, `DMMono-Medium.ttf`.
-2. In `Package.swift`, add `resources: [.process("Resources")]` to the `UIWorkouts` target.
-3. In `WKFont.Spec.font`, return `.custom("DM Sans", size:)` / `.custom("DM Mono", size:)`
-   (register them once at launch with `CTFontManagerRegisterFontsForURL` over the bundle,
-   or via an `Info.plist` `UIAppFonts` entry in each consuming app).
+## Updating the fonts
 
-Everything downstream (`.wkFont(_:)`, every component) is unchanged.
+Replace the `.ttf` in `Resources/Fonts/`, regenerate the snapshot references
+(`Scripts/record-snapshots.sh`), eyeball, commit.
