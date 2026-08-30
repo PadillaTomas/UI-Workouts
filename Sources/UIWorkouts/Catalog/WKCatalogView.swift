@@ -14,16 +14,18 @@ public struct WKCatalogView: View {
     }
 }
 
-/// The catalog body without the enclosing `ScrollView`, so snapshot tests can
-/// render it at its full intrinsic height. Not part of the public API.
-struct WKCatalogContent: View {
+/// The catalog body without the enclosing `ScrollView`, so the snapshot-test
+/// package (`SnapshotTests/`) can render it at its full intrinsic height.
+public struct WKCatalogContent: View {
     @State private var theme: WKThemeMode = .system
     @State private var toggle = true
     @State private var weekday = 0
     @State private var effort = 6
     @State private var choice = 0
 
-    var body: some View {
+    public init() {}
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: WKSpace.xxl) {
             group("Color") { colorRow }
             group("Buttons") {

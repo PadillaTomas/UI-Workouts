@@ -14,7 +14,4 @@
 /// Nothing here depends on any app. Components take primitives (`String`, `Int`
 /// seconds, `WKPhase`) — never domain models. Extract this folder to its own
 /// repository and only the consuming app's `Package.swift` changes.
-public enum UIWorkouts {
-    /// Package version, for diagnostics / about screens.
-    public static let version = "0.1.0"
-}
+public enum UIWorkouts {}

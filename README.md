@@ -71,19 +71,23 @@ design system targets iOS 17+.
 
 ### Visual-regression (snapshot) tests
 
-`Tests/UIWorkoutsSnapshotTests` renders `WKCatalogView` across a matrix of
+These live in a **nested package** — `SnapshotTests/` — so `swift-snapshot-testing`
+(and its transitive `swift-syntax` / `xctest-dynamic-overlay`) never reach a
+consumer of UIWorkouts. The main package has **zero external dependencies**.
+
+`SnapshotTests/Tests/SnapshotTests` renders `WKCatalogContent` across a matrix of
 **width × orientation × light/dark × Dynamic Type** and diffs the pixels against the
 committed reference PNGs in `__Snapshots__/`. This is the gate that catches "a padding
 change silently broke dark mode".
 
 ```
 # verify (what CI runs)
-xcodebuild test -scheme UIWorkouts -only-testing:UIWorkoutsSnapshotTests \
+cd SnapshotTests
+xcodebuild test -scheme SnapshotTests-Package -only-testing:SnapshotTests \
   -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
 
 # regenerate references after an INTENTIONAL visual change, then review + commit the PNGs
-SNAPSHOT_RECORD=1 xcodebuild test -scheme UIWorkouts -only-testing:UIWorkoutsSnapshotTests \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
+Scripts/record-snapshots.sh
 ```
 
 References were recorded on **iOS 26.5**. A different iOS runtime can fail on sub-pixel
@@ -93,10 +97,13 @@ runs logic tests + snapshot tests + an iOS build on every push and PR.
 ### Pre-tag checklist
 
 ```
-swift test
-xcodebuild test -scheme UIWorkouts -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
+swift test                                              # logic (zero-dep package)
+xcodebuild build -scheme UIWorkouts -destination 'generic/platform=iOS'
+cd SnapshotTests && xcodebuild test -scheme SnapshotTests-Package \
+  -only-testing:SnapshotTests \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5'
 ```
-Green on both → safe to `git tag x.y.z && git push --tags`.
+Green on all → safe to `git tag x.y.z && git push --tags`.
 
 ## Known gaps
 

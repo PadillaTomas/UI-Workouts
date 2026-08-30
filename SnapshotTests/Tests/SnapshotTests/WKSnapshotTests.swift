@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 import XCTest
 import SnapshotTesting
-@testable import UIWorkouts
+import UIWorkouts
 
 /// Visual-regression coverage for the design system.
 ///
