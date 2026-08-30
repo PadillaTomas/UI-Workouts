@@ -1,47 +1,33 @@
 name: CI
-
 on:
   push:
     branches: [main, develop]
   pull_request:
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   test:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
-
-      # The macos-26 runner already defaults to Xcode 26.x — just record which.
       - name: Show toolchain
         run: |
           xcodebuild -version
           xcrun simctl list runtimes | grep iOS
-
-      - name: swift test (logic)
+      - name: swift test (logic, zero-dep package)
         run: swift test
-
-      - name: xcodebuild test (snapshots)
-        run: |
-          set -o pipefail
-          xcodebuild test \
-            -scheme UIWorkouts \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
-            -only-testing:UIWorkoutsSnapshotTests \
-            -resultBundlePath TestResults.xcresult \
-            | xcbeautify
-
       - name: xcodebuild build (iOS library)
         run: |
           set -o pipefail
-          xcodebuild build \
-            -scheme UIWorkouts \
-            -destination 'generic/platform=iOS' \
-            | xcbeautify
-
+          xcodebuild build -scheme UIWorkouts -destination 'generic/platform=iOS' | xcbeautify
+      - name: xcodebuild test (snapshots, nested package)
+        working-directory: SnapshotTests
+        run: |
+          set -o pipefail
+          xcodebuild test -scheme SnapshotTests-Package -only-testing:SnapshotTests \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -resultBundlePath ../TestResults.xcresult | xcbeautify
       - name: Upload failed snapshot artifacts
         if: failure()
         uses: actions/upload-artifact@v4
