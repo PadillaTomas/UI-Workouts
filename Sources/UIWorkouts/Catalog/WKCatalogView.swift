@@ -197,6 +197,8 @@ public struct WKCatalogContent: View {
             }
             group("Scale selector") {
                 WKScaleSelector(selection: $effort, endLabels: ("Easy", "All out"))
+                WKScaleSelector(selection: $effort,
+                                endLabels: ("Easy throughout", "All I had"), maxPerRow: 5)
             }
             group("Rows") {
                 // A bare WKInsetGroup (no header/footer) — the rows are the same
