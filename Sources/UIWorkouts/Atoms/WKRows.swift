@@ -14,7 +14,11 @@ private struct WKRowMetrics: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
+    /// Apply the design system's settings-row metrics — a ``WKSize/rowHeight``
+    /// box with ``WKSpace/lg`` horizontal padding and centred content. Use it on
+    /// an app-specific row (a bespoke trailing control, a whole-row link) so it
+    /// lines up with ``WKToggleRow`` / ``WKNavRow`` inside a ``WKInsetGroup``.
     func wkRowMetrics() -> some View { modifier(WKRowMetrics()) }
 }
 

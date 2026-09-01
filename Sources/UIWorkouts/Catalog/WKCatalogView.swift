@@ -187,10 +187,23 @@ public struct WKCatalogContent: View {
             group("Rows") {
                 // A bare WKInsetGroup (no header/footer) — the rows are the same
                 // element and the same metrics as the "Inset group" section below.
+                // The last row is app-bespoke, matched with `.wkRowMetrics()`.
                 WKInsetGroup {
                     WKNavRow("Mode", value: "3-Day Plan") {}
-                    WKNavRow("Week starts", value: "Monday") {}
                     WKToggleRow("Interval tones", isOn: $toggle)
+                    Button {} label: {
+                        HStack(spacing: WKSpace.sm) {
+                            Text("See all workouts").wkFont(.body)
+                                .foregroundStyle(WKColor.textPrimary)
+                            Spacer(minLength: WKSpace.sm)
+                            Text("Week 2").wkFont(.body).foregroundStyle(WKColor.accent)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(WKColor.textTertiary)
+                        }
+                        .wkRowMetrics()
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             group("Headers") {
