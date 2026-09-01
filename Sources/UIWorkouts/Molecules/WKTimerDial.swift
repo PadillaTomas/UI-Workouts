@@ -9,6 +9,10 @@ import SwiftUI
 /// Takes a fraction + seconds, no domain model. The countdown keeps the mono
 /// tabular face (``WKFont/timerDisplay``) rather than ``WKArcGauge``'s light sans
 /// numeral: a value that changes every second must not reflow.
+///
+/// The eyebrow above the countdown defaults to the phase's own name
+/// (`Run` / `Walk`). A workout whose vocabulary differs — boxing rounds, an EMOM
+/// — passes its own `label`; the phase still drives the colour and animation.
 public struct WKTimerDial: View {
     public enum State { case running, paused, complete }
 
@@ -16,6 +20,7 @@ public struct WKTimerDial: View {
     private let phase: WKPhase
     private let caption: String
     private let seconds: Int
+    private let label: String?
     private let state: State
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -25,16 +30,21 @@ public struct WKTimerDial: View {
         phase: WKPhase,
         caption: String,
         seconds: Int,
+        label: String? = nil,
         state: State = .running
     ) {
         self.fraction = min(1, max(0, fraction))
         self.phase = phase
         self.caption = caption
         self.seconds = seconds
+        self.label = label
         self.state = state
     }
 
     private let lineWidth: CGFloat = 12
+
+    /// The eyebrow text — the caller's `label`, or the phase's own name.
+    private var eyebrow: String { label ?? phase.label }
 
     private var ringTint: Color {
         switch state {
@@ -58,7 +68,7 @@ public struct WKTimerDial: View {
                 .rotationEffect(.degrees(-90))
 
             VStack(spacing: WKSpace.xs) {
-                Text(state == .complete ? "Done" : phase.label)
+                Text(state == .complete ? "Done" : eyebrow)
                     .wkFont(.labelMono)
                     .foregroundStyle(state == .complete ? WKColor.textTertiary
                                                         : phase.onSoftColor)
@@ -77,7 +87,7 @@ public struct WKTimerDial: View {
         .aspectRatio(1, contentMode: .fit)
         .animation(reduceMotion ? nil : WKMotion.tick, value: drawnFraction)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(phase.label). \(caption)")
+        .accessibilityLabel("\(eyebrow). \(caption)")
         .accessibilityValue("\(WKTimeFormat.spoken(seconds)) remaining")
     }
 }
@@ -88,7 +98,7 @@ public struct WKTimerDial: View {
                     caption: "Easy. You should still be able to talk.",
                     seconds: 154)
         WKTimerDial(fraction: 0.7, phase: .walk, caption: "Catch your breath.",
-                    seconds: 48, state: .paused)
+                    seconds: 48, label: "Rest", state: .paused)
         WKTimerDial(fraction: 1, phase: .run, caption: "Interval finished.",
                     seconds: 0, state: .complete)
     }
