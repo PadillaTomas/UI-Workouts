@@ -117,10 +117,17 @@ Green on all → safe to `git tag x.y.z && git push --tags`.
 In an app's `Package.swift` (or Xcode → Add Package Dependencies):
 
 ```swift
-.package(url: "https://github.com/PadillaTomas/UI-Workouts.git", from: "0.1.0")
+.package(url: "https://github.com/PadillaTomas/UI-Workouts.git", from: "1.0.0")
 ```
 
 then add `"UIWorkouts"` to the target's dependencies and `import UIWorkouts`.
-Releases are git tags (`git tag 0.1.0 && git push --tags`); bump per semver.
+Releases are git tags (`git tag 1.0.0 && git push --tags`); bump per semver.
+
+**`1.0.0`** is the first stable release — the "Ambient Dark" system with
+trait-adaptive light/dark. Everything up to `0.5.0` was pre-stabilisation
+(`0.5.0` is what the App Store build of *Rounds 1.0* is pinned to). During
+co-development, consuming apps point at this package by local path
+(`path: "../UI-Workouts"`) and only flip back to a `from:` / `exactVersion:`
+tag at an app release.
 
 DM Sans / DM Mono are bundled and self-register — see [`FONTS.md`](FONTS.md).
