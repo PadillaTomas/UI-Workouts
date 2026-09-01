@@ -12,7 +12,8 @@
 ///   `WKMonthGrid`, `WKChoiceCard`, `WKWeekdayPicker`, `WKWeekStrip`, `WKScaleSelector`,
 ///   `WKSectionHeader`, `WKScreenHeader`, `WKFooterActions`, `WKAmbientBackground`,
 ///   `WKArcGauge`, `WKSegmentedToggle`, `WKMetricRow`, `WKStatCard`, `WKConfirmCard`,
-///   `WKStatChip`, `WKSheetHeader`, `WKValueSlider`, `WKFloatingTabBar`, `WKInsetGroup`)
+///   `WKStatChip`, `WKSheetHeader`, `WKSheet`, `WKValueSlider`, `WKFloatingTabBar`,
+///   `WKInsetGroup`)
 /// - **Catalog** (`WKCatalogView`) — a gallery for reviewing the system in isolation
 ///
 /// A consuming app should pin `.preferredColorScheme(.dark)` at its root so the

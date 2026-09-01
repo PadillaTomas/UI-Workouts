@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Layer 2 — a large selectable option (plan mode, starting week). Selected =
-/// accent border + checkmark. `compact` tightens it for list use.
+/// accent border + filled checkmark. `compact` tightens it for list use.
+/// Unchanged from v1 — only the palette moved under it.
 public struct WKChoiceCard: View {
     private let title: String
     private let detail: String?
@@ -48,8 +49,8 @@ public struct WKChoiceCard: View {
             .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous)
-                    .strokeBorder(isSelected ? WKColor.accent.opacity(0.5) : WKColor.border,
-                                  lineWidth: 1)
+                    .strokeBorder(isSelected ? WKColor.accent : WKColor.border,
+                                  lineWidth: isSelected ? 1.5 : 1)
             )
             .contentShape(Rectangle())
         }

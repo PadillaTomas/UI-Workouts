@@ -98,6 +98,20 @@ public struct WKCatalogContent: View {
                     .background(WKColor.surface)
                     .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
             }
+            group("Sheet") {
+                WKSheet(title: "Week 2 · Day 1", onClose: {}, scrolls: false) {
+                    VStack(alignment: .leading, spacing: WKSpace.xl) {
+                        WKPill("Today", tone: .run)
+                        VStack(spacing: 0) {
+                            WKMetricRow(title: "Time", value: "22:14")
+                            WKMetricRow(title: "Felt", value: "6 — Steady")
+                            WKMetricRow(title: "Status", value: "Done")
+                        }
+                    }
+                }
+                .frame(height: 300)
+                .clipShape(RoundedRectangle(cornerRadius: WKRadius.sheet, style: .continuous))
+            }
             group("Value slider") {
                 WKValueSlider(value: $goal, range: 100...650, step: 10,
                               format: { "\(Int($0)) Cal" }, suggested: 300)

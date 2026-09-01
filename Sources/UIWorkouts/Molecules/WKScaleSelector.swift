@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Layer 2 — a 1…N rating selector (post-workout effort). Generic range + end
-/// labels; nothing about running.
+/// labels; nothing about running. Each step is tinted by its position on
+/// ``WKRamp`` (cool → warm); the selected step fills with that colour.
 public struct WKScaleSelector: View {
     private let range: ClosedRange<Int>
     private let endLabels: (low: String, high: String)
@@ -31,7 +32,7 @@ public struct WKScaleSelector: View {
                     } label: {
                         Text("\(value)")
                             .font(.system(size: 15, weight: .medium, design: .monospaced))
-                            .foregroundStyle(isOn ? WKColor.bg : WKColor.textSecondary)
+                            .foregroundStyle(isOn ? WKColor.bg : WKRamp.stop(at: position))
                             .frame(maxWidth: .infinity, minHeight: WKSize.minTarget)
                             .background(isOn ? WKRamp.stop(at: position) : WKColor.surface)
                             .clipShape(RoundedRectangle(cornerRadius: WKRadius.chip,

@@ -35,6 +35,7 @@ public struct WKSheetHeader: View {
                 .wkFont(.headline)
                 .foregroundStyle(WKColor.textPrimary)
                 .lineLimit(1)
+                .padding(.horizontal, WKSize.minTarget)   // never collide with the buttons
                 .accessibilityAddTraits(.isHeader)
 
             HStack {
@@ -64,8 +65,8 @@ public struct WKSheetHeader: View {
                 }
             }
         }
-        .padding(.horizontal, WKSpace.lg)
-        .frame(height: WKSize.timerControl)
+        .padding(.horizontal, WKSpace.xl)
+        .frame(height: WKSize.timerControl + WKSpace.sm)
     }
 
     @ViewBuilder private var leadingLabel: some View {
