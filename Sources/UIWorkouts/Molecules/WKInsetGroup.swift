@@ -31,6 +31,7 @@ public struct WKInsetGroup<Content: View>: View {
                 Text(header)
                     .wkFont(.callout)
                     .foregroundStyle(WKColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, WKSpace.md)
                     .accessibilityAddTraits(.isHeader)
             }
@@ -45,6 +46,7 @@ public struct WKInsetGroup<Content: View>: View {
                 Text(footer)
                     .wkFont(.caption)
                     .foregroundStyle(WKColor.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, WKSpace.md)
             }
         }
