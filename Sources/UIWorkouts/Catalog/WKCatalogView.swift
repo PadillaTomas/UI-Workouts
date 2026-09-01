@@ -75,6 +75,9 @@ public struct WKCatalogContent: View {
                 WKMetricRow(title: "Consistency", value: "Good", fraction: 0.6)
                 WKMetricRow(title: "This week", value: "3 of 3", showsChevron: true) {}
             }
+            group("Health context row") {
+                WKHealthContextRow(label: "Health", segments: ["4.1 km", "5:34 /km", "141 bpm avg"])
+            }
             group("Stat cards") {
                 HStack(spacing: WKSpace.md) {
                     WKStatCard(caption: "Total time", value: "8h 20m",
