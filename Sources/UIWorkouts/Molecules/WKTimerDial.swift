@@ -47,34 +47,33 @@ public struct WKTimerDial: View {
     private var drawnFraction: Double { state == .complete ? 1 : fraction }
 
     public var body: some View {
-        GeometryReader { geo in
-            let d = min(geo.size.width, geo.size.height)
-            ZStack {
-                Circle()
-                    .stroke(WKColor.border, lineWidth: lineWidth)
+        ZStack {
+            Circle()
+                .stroke(WKColor.border, lineWidth: lineWidth)
 
-                Circle()
-                    .trim(from: 0, to: drawnFraction)
-                    .stroke(ringTint,
-                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
+            Circle()
+                .trim(from: 0, to: drawnFraction)
+                .stroke(ringTint,
+                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
 
-                VStack(spacing: WKSpace.xs) {
-                    Text(state == .complete ? "Done" : phase.label)
-                        .wkFont(.labelMono)
-                        .foregroundStyle(state == .complete ? WKColor.textTertiary
-                                                            : phase.onSoftColor)
-                    WKTimeText(seconds: seconds, size: .display)
-                        .foregroundStyle(WKColor.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                }
-                .frame(width: d * 0.66)
+            VStack(spacing: WKSpace.xs) {
+                Text(state == .complete ? "Done" : phase.label)
+                    .wkFont(.labelMono)
+                    .foregroundStyle(state == .complete ? WKColor.textTertiary
+                                                        : phase.onSoftColor)
+                WKTimeText(seconds: seconds, size: .display)
+                    .foregroundStyle(WKColor.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
-            .frame(width: d, height: d)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(lineWidth / 2)
+            .multilineTextAlignment(.center)
+            .padding(lineWidth * 3.5)
         }
+        // The `Circle`s carry no intrinsic size, so square the whole stack and
+        // let it fill the width it's given — the ring stays dead-centre.
+        .padding(lineWidth / 2)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .aspectRatio(1, contentMode: .fit)
         .animation(reduceMotion ? nil : WKMotion.tick, value: drawnFraction)
         .accessibilityElement(children: .ignore)
