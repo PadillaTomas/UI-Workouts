@@ -10,10 +10,10 @@ public struct WKAmbientBackground: View {
 
         var color: Color {
             switch self {
-            case .neutral: return Color(rgb: 0x17202A)
-            case .run: return Color(rgb: 0x241A12)
-            case .walk: return Color(rgb: 0x12262B)
-            case .done: return Color(rgb: 0x14211C)
+            case .neutral: return Color(light: 0xEDE8DF, dark: 0x17202A)
+            case .run: return Color(light: 0xF6E9D6, dark: 0x241A12)
+            case .walk: return Color(light: 0xDCEFE9, dark: 0x12262B)
+            case .done: return Color(light: 0xE4EDE6, dark: 0x14211C)
             }
         }
     }

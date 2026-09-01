@@ -1,7 +1,8 @@
 /// # UIWorkouts
 ///
-/// The shared design system for the Workouts app ecosystem. One appearance —
-/// "Ambient Dark" — no light/dark split. Layers:
+/// The shared design system for the Workouts app ecosystem. "Ambient Dark" is
+/// the primary theme; a light appearance is carried alongside it (AA-safe) and
+/// every semantic token resolves itself against the trait environment. Layers:
 ///
 /// - **Tokens** (`WKColor`, `WKPhase`, `WKRamp`, `WKSpace`, `WKRadius`, `WKSize`,
 ///   `WKFont`, `WKMotion`)
@@ -13,11 +14,12 @@
 ///   `WKSectionHeader`, `WKScreenHeader`, `WKFooterActions`, `WKAmbientBackground`,
 ///   `WKArcGauge`, `WKSegmentedToggle`, `WKMetricRow`, `WKStatCard`, `WKConfirmCard`,
 ///   `WKStatChip`, `WKSheetHeader`, `WKSheet`, `WKValueSlider`, `WKFloatingTabBar`,
-///   `WKInsetGroup`)
+///   `WKInsetGroup`, `WKThemePicker`)
 /// - **Catalog** (`WKCatalogView`) — a gallery for reviewing the system in isolation
 ///
-/// A consuming app should pin `.preferredColorScheme(.dark)` at its root so the
-/// system chrome (nav bars, keyboards) matches the single dark appearance.
+/// A consuming app drives appearance from its own `WKAppearance` preference —
+/// `.preferredColorScheme(pref.colorScheme)` at the root (`nil` follows the
+/// system) — and can surface it with `WKThemePicker`.
 ///
 /// Nothing here depends on any app. Components take primitives (`String`, `Int`
 /// seconds, `WKPhase`) — never domain models.

@@ -25,6 +25,7 @@ public struct WKCatalogContent: View {
     @State private var tab = "today"
     @State private var goal = 300.0
     @State private var insetTones = true
+    @State private var appearance: WKAppearance = .dark
 
     public init() {}
 
@@ -58,6 +59,9 @@ public struct WKCatalogContent: View {
                            bounds: ("0", "100"),
                            segments: [.init(fraction: 1, color: WKRamp.stops[1])])
                     .frame(maxWidth: .infinity)
+            }
+            group("Theme picker") {
+                WKThemePicker(selection: $appearance)
             }
             group("Segmented toggle") {
                 WKSegmentedToggle(selection: $seg, options: [

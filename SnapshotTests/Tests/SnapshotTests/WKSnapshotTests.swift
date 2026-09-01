@@ -8,11 +8,11 @@ import UIWorkouts
 /// Visual-regression coverage for the design system.
 ///
 /// Renders the whole `WKCatalogView` (every token, atom and molecule) at a
-/// phone-width layout and diffs the pixels against the committed reference image
-/// in `__Snapshots__/`. One image — the system has a single "Ambient Dark"
-/// appearance and the ecosystem is phone-first — which catches the large
-/// majority of real regressions without a device matrix to re-record on every
-/// Xcode bump.
+/// phone-width layout and diffs the pixels against the committed reference images
+/// in `__Snapshots__/`. Two images — the primary "Ambient Dark" appearance and
+/// the light appearance carried alongside it — at phone width, which catches the
+/// large majority of real regressions without a device matrix to re-record on
+/// every Xcode bump.
 ///
 /// Regenerate the references after an intentional visual change:
 /// ```
@@ -42,6 +42,18 @@ final class WKSnapshotTests: XCTestCase {
             of: view,
             as: .image(layout: .sizeThatFits, traits: traits(.dark)),
             named: "compact-dark",
+            record: recording
+        )
+    }
+
+    func test_catalog_fullLength_light() {
+        let view = WKCatalogContent()
+            .frame(width: 390)
+            .environment(\.colorScheme, .light)
+        assertSnapshot(
+            of: view,
+            as: .image(layout: .sizeThatFits, traits: traits(.light)),
+            named: "compact-light",
             record: recording
         )
     }

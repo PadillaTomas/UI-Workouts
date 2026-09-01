@@ -22,9 +22,11 @@ Layer 3 (app screens — anything that names weeks, intervals or dates) stays in
 - Components take primitives — `String`, `Int` seconds, `WKPhase` — never domain models.
   `WKIntervalRow` takes strings and seconds, not a `Session`; `WKMonthGrid` takes `[WKDay]`,
   not `Date`.
-- One appearance — "Ambient Dark". Every token is a single fixed value; call sites never
-  branch on `colorScheme`. A consuming app should pin `.preferredColorScheme(.dark)` at
-  its root so the system chrome matches.
+- "Ambient Dark" is the primary theme; a light appearance (AA-safe) is carried alongside
+  it. Every semantic token is a `light`/`dark` pair that resolves against the trait
+  environment — call sites never branch on `colorScheme`. A consuming app drives
+  appearance from a `WKAppearance` preference (`.preferredColorScheme(pref.colorScheme)`
+  at its root, `nil` = follow system) and can surface it with `WKThemePicker`.
 - Accessibility: Dynamic Type supported (timer digits cap at XL, tabular), 44pt min targets,
   phase is shown by color **and** text **and** position, timers expose a spoken
   `accessibilityValue`.

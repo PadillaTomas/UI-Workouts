@@ -9,13 +9,14 @@ import SwiftUI
 /// type. Where a ramp colour must read as a value, pair it with a ``WKStatChip``
 /// tint or step to the darker end.
 public enum WKRamp {
-    /// The five ordered stops, cool → hot.
+    /// The five ordered stops, cool → hot. Light values step darker so the ramp
+    /// keeps its ordering against a pale background.
     public static let stops: [Color] = [
-        Color(rgb: 0x4A8FB5), // cool
-        Color(rgb: 0x5FC9AE), // teal
-        Color(rgb: 0xC9C86A), // neutral
-        Color(rgb: 0xD9A05B), // warm
-        Color(rgb: 0xC4635B), // hot
+        Color(light: 0x3C7A9C, dark: 0x4A8FB5), // cool
+        Color(light: 0x2E8C74, dark: 0x5FC9AE), // teal
+        Color(light: 0x93911F, dark: 0xC9C86A), // neutral
+        Color(light: 0xA9722A, dark: 0xD9A05B), // warm
+        Color(light: 0xA64A42, dark: 0xC4635B), // hot
     ]
 
     /// Nearest stop for a `0…1` position.
