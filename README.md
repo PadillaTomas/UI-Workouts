@@ -8,10 +8,10 @@ The shared SwiftUI design system for the Workouts app ecosystem. First consumer:
 
 | Layer | Folder | Contents |
 |---|---|---|
-| 0 · Tokens | `Sources/UIWorkouts/Tokens` | `WKColor`, `WKPhase`, `WKSpace`, `WKRadius`, `WKSize`, `WKFont`, `WKMotion` |
-| — · Foundations | `Sources/UIWorkouts/Foundations` | `WKThemeMode`, `.wkFont(_:)`, `WKTimeFormat`, `Color(light:dark:)` |
+| 0 · Tokens | `Sources/UIWorkouts/Tokens` | `WKColor`, `WKPhase`, `WKRamp`, `WKSpace`, `WKRadius`, `WKSize`, `WKFont`, `WKMotion` |
+| — · Foundations | `Sources/UIWorkouts/Foundations` | `.wkFont(_:)`, `WKTimeFormat`, `Color(rgb:)` |
 | 1 · Atoms | `Sources/UIWorkouts/Atoms` | `WKButton`, `WKCard`, `WKPill`, `WKTimeText`, `WKLabelMono`, `WKRadioDot`, `WKCheckbox`, `WKToggleRow`, `WKNavRow`, `WKPhaseBar`, `WKProgressRing` |
-| 2 · Molecules | `Sources/UIWorkouts/Molecules` | `WKIntervalRow`, `WKSegmentedTrack`, `WKTimerDial`, `WKDayCell`, `WKMonthGrid`, `WKChoiceCard`, `WKWeekdayPicker`, `WKWeekStrip`, `WKScaleSelector`, `WKThemePicker`, `WKSectionHeader`, `WKScreenHeader`, `WKFooterActions` |
+| 2 · Molecules | `Sources/UIWorkouts/Molecules` | `WKIntervalRow`, `WKSegmentedTrack`, `WKTimerDial`, `WKDayCell`, `WKMonthGrid`, `WKChoiceCard`, `WKWeekdayPicker`, `WKWeekStrip`, `WKScaleSelector`, `WKSectionHeader`, `WKScreenHeader`, `WKFooterActions`, `WKAmbientBackground`, `WKArcGauge`, `WKSegmentedToggle`, `WKMetricRow`, `WKStatCard`, `WKConfirmCard`, `WKStatChip`, `WKSheetHeader`, `WKValueSlider`, `WKFloatingTabBar`, `WKInsetGroup` |
 | — · Catalog | `Sources/UIWorkouts/Catalog` | `WKCatalogView` — a gallery of every component in every state |
 
 Layer 3 (app screens — anything that names weeks, intervals or dates) stays in the app.
@@ -22,9 +22,9 @@ Layer 3 (app screens — anything that names weeks, intervals or dates) stays in
 - Components take primitives — `String`, `Int` seconds, `WKPhase` — never domain models.
   `WKIntervalRow` takes strings and seconds, not a `Session`; `WKMonthGrid` takes `[WKDay]`,
   not `Date`.
-- Colors resolve light/dark from the trait environment, so call sites never branch on
-  `colorScheme`. `WKThemeMode` / `WKThemePicker` only drive `.preferredColorScheme` at the
-  app root.
+- One appearance — "Ambient Dark". Every token is a single fixed value; call sites never
+  branch on `colorScheme`. A consuming app should pin `.preferredColorScheme(.dark)` at
+  its root so the system chrome matches.
 - Accessibility: Dynamic Type supported (timer digits cap at XL, tabular), 44pt min targets,
   phase is shown by color **and** text **and** position, timers expose a spoken
   `accessibilityValue`.
@@ -52,10 +52,10 @@ struct SomeScreen: View {
 
 Three ways, increasing fidelity:
 
-1. **Xcode Previews** — every component file has a `#Preview`; `WKCatalogView.swift` has
-   light + dark gallery presets. This is the day-to-day tool (≈ Storybook).
-2. **Demo app** — `Demo/Catalog.xcodeproj`, an iPhone/iPad app that hosts `WKCatalogView`
-   with a theme switcher. Run it to click through on a real simulator or device.
+1. **Xcode Previews** — every component file has a `#Preview`; `WKCatalogView.swift` has a
+   full gallery preview. This is the day-to-day tool (≈ Storybook).
+2. **Demo app** — `Demo/Catalog.xcodeproj`, an iPhone/iPad app that hosts `WKCatalogView`.
+   Run it to click through on a real simulator or device.
    It references the package by local path, so it always tracks your working copy.
 3. **Snapshot tests** — see below.
 
@@ -75,10 +75,9 @@ These live in a **nested package** — `SnapshotTests/` — so `swift-snapshot-t
 (and its transitive `swift-syntax` / `xctest-dynamic-overlay`) never reach a
 consumer of UIWorkouts. The main package has **zero external dependencies**.
 
-`SnapshotTests/Tests/SnapshotTests` renders `WKCatalogContent` across a matrix of
-**width × orientation × light/dark × Dynamic Type** and diffs the pixels against the
-committed reference PNGs in `__Snapshots__/`. This is the gate that catches "a padding
-change silently broke dark mode".
+`SnapshotTests/Tests/SnapshotTests` renders `WKCatalogContent` at phone width and diffs
+the pixels against the committed reference PNG in `__Snapshots__/`. This is the gate that
+catches "a padding change silently broke the catalog".
 
 ```
 # verify (what CI runs)

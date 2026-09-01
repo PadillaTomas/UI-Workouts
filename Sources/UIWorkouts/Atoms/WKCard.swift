@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Layer 1 — the base surface container: `surface` fill, 1px `border`, card radius.
+/// Layer 1 — the base surface container: `surface` fill, card radius, **no
+/// hairline** — separation comes from the surface value, as in the reference.
 public struct WKCard<Content: View>: View {
     private let padding: CGFloat
     private let content: Content
@@ -16,10 +17,6 @@ public struct WKCard<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(WKColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous)
-                    .strokeBorder(WKColor.border, lineWidth: 1)
-            )
     }
 }
 

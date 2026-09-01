@@ -7,4 +7,6 @@ public enum WKMotion {
     public static let calm: Animation = .easeOut(duration: 0.35)
     /// Per-second timer updates — quick, no bounce.
     public static let tick: Animation = .easeOut(duration: 0.15)
+    /// Ambient tint change on phase switch — slow enough to read as a mood shift.
+    public static let ambientCrossfade: Animation = .easeInOut(duration: 0.6)
 }

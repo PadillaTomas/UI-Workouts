@@ -62,13 +62,6 @@ struct TokenTests {
         #expect(WKColor.danger != WKColor.stateDone)
     }
 
-    @Test("theme mode maps to color scheme")
-    func theme() {
-        #expect(WKThemeMode.system.colorScheme == nil)
-        #expect(WKThemeMode.light.colorScheme == .light)
-        #expect(WKThemeMode.dark.colorScheme == .dark)
-    }
-
     @Test("every font style resolves a spec")
     func fonts() {
         for style in WKFont.allCases {

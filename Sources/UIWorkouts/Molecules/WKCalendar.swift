@@ -49,7 +49,7 @@ public struct WKDayCell: View {
         case .default, .outsideMonth:
             r.fill(WKColor.surface).overlay(r.strokeBorder(WKColor.border, lineWidth: 1))
         case .done:
-            r.fill(Color(light: 0xEAF0E8, dark: 0x22301F))
+            r.fill(WKColor.surfaceRaised)
                 .overlay(r.strokeBorder(WKColor.stateDone.opacity(0.4), lineWidth: 1))
         case .today:
             r.fill(WKColor.textPrimary)

@@ -1,7 +1,21 @@
 # Fonts
 
-The design specifies **DM Sans** (text) and **DM Mono** (timer + mono labels), both
-SIL OFL.
+The "Ambient Dark" scale (v2) uses three faces: **DM Sans** (text + big light
+metric numerals), **DM Mono** (countdowns + uppercase metric eyebrows) and
+**Instrument Serif** (the one reassuring headline per screen). All SIL OFL.
+
+## ⚠️ Instrument Serif — .ttf files still need to be added
+
+`WKFontRegistration.run` already lists `InstrumentSerif-Regular` and
+`InstrumentSerif-Italic`, and `WKFont` resolves the serif cases (`displayL/M/S`)
+by the family name `"Instrument Serif"`. Until the two files land the serif styles
+fall back to the system serif — the package still builds and runs.
+
+To finish: download **Instrument Serif** (Regular + Italic) from Google Fonts
+(<https://fonts.google.com/specimen/Instrument+Serif>, OFL), drop
+`InstrumentSerif-Regular.ttf` and `InstrumentSerif-Italic.ttf` into
+`Sources/UIWorkouts/Resources/Fonts/`, add the `OFL.txt` as
+`OFL-InstrumentSerif.txt`, then re-record the snapshot references.
 
 ## Current state — the real faces are in
 

@@ -48,8 +48,8 @@ public struct WKChoiceCard: View {
             .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous)
-                    .strokeBorder(isSelected ? WKColor.accent : WKColor.border,
-                                  lineWidth: isSelected ? 1.5 : 1)
+                    .strokeBorder(isSelected ? WKColor.accent.opacity(0.5) : WKColor.border,
+                                  lineWidth: 1)
             )
             .contentShape(Rectangle())
         }

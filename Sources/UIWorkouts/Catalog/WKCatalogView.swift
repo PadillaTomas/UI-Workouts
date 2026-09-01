@@ -17,17 +17,106 @@ public struct WKCatalogView: View {
 /// The catalog body without the enclosing `ScrollView`, so the snapshot-test
 /// package (`SnapshotTests/`) can render it at its full intrinsic height.
 public struct WKCatalogContent: View {
-    @State private var theme: WKThemeMode = .system
     @State private var toggle = true
     @State private var weekday = 0
     @State private var effort = 6
     @State private var choice = 0
+    @State private var seg = "debt"
+    @State private var tab = "today"
+    @State private var goal = 300.0
+    @State private var insetTones = true
 
     public init() {}
 
     public var body: some View {
         VStack(alignment: .leading, spacing: WKSpace.xxl) {
             group("Color") { colorRow }
+            group("Ramp") { rampRow }
+            group("Display type (serif)") {
+                Text("Nice and easy").wkFont(.displayL).foregroundStyle(WKColor.textPrimary)
+                Text("That's five behind you").wkFont(.displayM)
+                    .foregroundStyle(WKColor.textPrimary)
+                Text("Making progress").wkFont(.displayS)
+                    .foregroundStyle(WKColor.textPrimary)
+            }
+            group("Metric numerals (light sans)") {
+                Text("72").wkFont(.metricXL).foregroundStyle(WKColor.textPrimary)
+                Text("8h 20m").wkFont(.metricL).foregroundStyle(WKColor.textPrimary)
+            }
+            group("Ambient background") {
+                ZStack(alignment: .topLeading) {
+                    WKAmbientBackground(.walk, height: 160)
+                    Text("WALK").wkFont(.labelMono)
+                        .foregroundStyle(WKPhase.walk.onSoftColor)
+                        .padding(WKSpace.lg)
+                }
+                .frame(height: 160)
+                .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
+            }
+            group("Arc gauge") {
+                WKArcGauge(fraction: 0.72, value: "72", caption: "PLAN PROGRESS",
+                           bounds: ("0", "100"),
+                           segments: [.init(fraction: 1, color: WKRamp.stops[1])])
+                    .frame(maxWidth: .infinity)
+            }
+            group("Segmented toggle") {
+                WKSegmentedToggle(selection: $seg, options: [
+                    (value: "debt", label: "Sleep debt"),
+                    (value: "total", label: "Total sleep")
+                ])
+            }
+            group("Metric rows") {
+                WKMetricRow(title: "Total time", value: "7h 42m", fraction: 0.82,
+                            tint: WKPhase.walk.color)
+                WKMetricRow(title: "Consistency", value: "Good", fraction: 0.6)
+                WKMetricRow(title: "This week", value: "3 of 3", showsChevron: true) {}
+            }
+            group("Stat cards") {
+                HStack(spacing: WKSpace.md) {
+                    WKStatCard(caption: "Total time", value: "8h 20m",
+                               chip: ("On track", .walk), accessory: .info)
+                    WKStatCard(caption: "Sessions", value: "12", accessory: .chevron) {}
+                }
+            }
+            group("Stat chips") {
+                HStack(spacing: WKSpace.sm) {
+                    WKStatChip("Low", tone: .walk)
+                    WKStatChip("Behind", tone: .ramp(4))
+                    WKStatChip("Optimal", tone: .accent)
+                    WKStatChip("Rest", tone: .neutral)
+                }
+            }
+            group("Confirm card") {
+                WKConfirmCard(title: "You missed Tuesday",
+                              detail: "Mark it done if you ran anyway, or skip it.",
+                              primaryLabel: "Mark done", onPrimary: {},
+                              secondaryLabel: "Skip", onSecondary: {}, onDismiss: {})
+            }
+            group("Sheet header") {
+                WKSheetHeader(title: "Edit goal", onLeading: {},
+                              trailingLabel: "Save", trailingEnabled: false, onTrailing: {})
+                    .background(WKColor.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
+            }
+            group("Value slider") {
+                WKValueSlider(value: $goal, range: 100...650, step: 10,
+                              format: { "\(Int($0)) Cal" }, suggested: 300)
+            }
+            group("Floating tab bar") {
+                WKFloatingTabBar(selection: $tab, items: [
+                    (value: "today", systemImage: "sun.max", label: "Today"),
+                    (value: "plan", systemImage: "calendar", label: "Plan"),
+                    (value: "you", systemImage: "person", label: "You")
+                ], trailingSystemImage: "plus", onTrailing: {})
+                .frame(maxWidth: .infinity)
+            }
+            group("Inset group") {
+                WKInsetGroup(header: "During a session",
+                             footer: "Tones play at each interval change.") {
+                    WKToggleRow("Interval tones", isOn: $insetTones)
+                    WKNavRow("Countdown", value: "3 seconds") {}
+                }
+            }
             group("Buttons") {
                 WKButton("Start session", style: .primary, size: .large) {}
                 WKButton("Mark done", style: .secondary) {}
@@ -96,15 +185,13 @@ public struct WKCatalogContent: View {
                 WKScaleSelector(selection: $effort, endLabels: ("Easy", "All out"))
             }
             group("Rows") {
-                VStack(spacing: 0) {
+                // A bare WKInsetGroup (no header/footer) — the rows are the same
+                // element and the same metrics as the "Inset group" section below.
+                WKInsetGroup {
                     WKNavRow("Mode", value: "3-Day Plan") {}
+                    WKNavRow("Week starts", value: "Monday") {}
                     WKToggleRow("Interval tones", isOn: $toggle)
                 }
-                .background(WKColor.surface)
-                .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
-            }
-            group("Theme picker") {
-                WKThemePicker(selection: $theme)
             }
             group("Headers") {
                 WKScreenHeader(eyebrow: "Wednesday", title: "Week 2, Day 1",
@@ -147,6 +234,17 @@ public struct WKCatalogContent: View {
         }
     }
 
+    private var rampRow: some View {
+        HStack(spacing: WKSpace.xs) {
+            ForEach(Array(WKRamp.stops.enumerated()), id: \.offset) { _, color in
+                RoundedRectangle(cornerRadius: WKRadius.chip, style: .continuous)
+                    .fill(color)
+                    .frame(height: 44)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
     private var sampleSegments: [WKTrackSegment] {
         [WKTrackSegment(id: 0, weight: 2, progress: .done, phase: .run),
          WKTrackSegment(id: 1, weight: 1, progress: .done, phase: .walk),
@@ -162,10 +260,6 @@ public struct WKCatalogContent: View {
     }
 }
 
-#Preview("Catalog — light") {
-    WKCatalogView().wkThemeMode(.light)
-}
-
-#Preview("Catalog — dark") {
-    WKCatalogView().wkThemeMode(.dark)
+#Preview("Catalog") {
+    WKCatalogView().preferredColorScheme(.dark)
 }

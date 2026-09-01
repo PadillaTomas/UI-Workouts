@@ -1,6 +1,26 @@
 import SwiftUI
 
-/// Layer 1 — a settings row with a trailing toggle, tinted `stateDone` when on.
+/// Uniform metrics for every settings row — ``WKToggleRow``, ``WKNavRow`` and any
+/// future one. A single ``WKSize/rowHeight`` box, ``WKSpace/lg`` horizontal
+/// padding, content vertically centred, so a 31pt switch and a 22pt label row
+/// occupy the exact same space and line up — whether the row is standalone or
+/// inside a ``WKInsetGroup``.
+private struct WKRowMetrics: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: .infinity, minHeight: WKSize.rowHeight, alignment: .leading)
+            .padding(.horizontal, WKSpace.lg)
+            .contentShape(Rectangle())
+    }
+}
+
+extension View {
+    func wkRowMetrics() -> some View { modifier(WKRowMetrics()) }
+}
+
+/// Layer 1 — a settings row with a trailing toggle, tinted `accent` when on.
+/// (Not `stateDone`: that is cream, which would compete with the toggle's own
+/// near-white thumb. `accent` is the active-control signal, as in the reference.)
 public struct WKToggleRow: View {
     private let title: String
     @Binding private var isOn: Bool
@@ -15,10 +35,10 @@ public struct WKToggleRow: View {
             Text(title)
                 .wkFont(.body)
                 .foregroundStyle(WKColor.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .tint(WKColor.stateDone)
-        .frame(minHeight: WKSize.minTarget)
-        .padding(.horizontal, WKSpace.lg)
+        .tint(WKColor.accent)
+        .wkRowMetrics()
     }
 }
 
@@ -51,9 +71,7 @@ public struct WKNavRow: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(WKColor.textTertiary)
             }
-            .frame(minHeight: WKSize.minTarget)
-            .padding(.horizontal, WKSpace.lg)
-            .contentShape(Rectangle())
+            .wkRowMetrics()
         }
         .buttonStyle(WKPressStyle())
     }

@@ -22,6 +22,10 @@ public struct WKScaleSelector: View {
             HStack(spacing: WKSpace.xs) {
                 ForEach(Array(range), id: \.self) { value in
                     let isOn = value == selection
+                    let position = range.upperBound > range.lowerBound
+                        ? Double(value - range.lowerBound)
+                            / Double(range.upperBound - range.lowerBound)
+                        : 0
                     Button {
                         selection = value
                     } label: {
@@ -29,7 +33,7 @@ public struct WKScaleSelector: View {
                             .font(.system(size: 15, weight: .medium, design: .monospaced))
                             .foregroundStyle(isOn ? WKColor.bg : WKColor.textSecondary)
                             .frame(maxWidth: .infinity, minHeight: WKSize.minTarget)
-                            .background(isOn ? WKColor.accent : WKColor.surface)
+                            .background(isOn ? WKRamp.stop(at: position) : WKColor.surface)
                             .clipShape(RoundedRectangle(cornerRadius: WKRadius.chip,
                                                         style: .continuous))
                             .overlay(
