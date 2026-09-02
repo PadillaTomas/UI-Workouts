@@ -96,6 +96,25 @@ public struct WKCatalogContent: View {
                               primaryLabel: "Mark done", onPrimary: {},
                               secondaryLabel: "Skip", onSecondary: {}, onDismiss: {})
             }
+            group("Paywall") {
+                WKPaywall(
+                    title: "Track your training with Rounds Pro",
+                    subtitle: "Every workout you finish, remembered.",
+                    features: [
+                        .init(systemImage: "clock.arrow.circlepath", title: "Activity history",
+                              detail: "Every finished workout, with weekly and total counts."),
+                        .init(systemImage: "calendar", title: "Calendar",
+                              detail: "See your training on a month grid."),
+                        .init(systemImage: "square.and.arrow.up", title: "Share card"),
+                    ],
+                    priceLabel: "$3.99 · one-time, yours forever",
+                    ctaLabel: "Unlock Rounds Pro",
+                    restoreLabel: "Restore Purchase",
+                    onPurchase: {}, onRestore: {}, onClose: {}
+                )
+                .frame(height: 520)
+                .clipShape(RoundedRectangle(cornerRadius: WKRadius.card, style: .continuous))
+            }
             group("Sheet header") {
                 WKSheetHeader(title: "Edit goal", onLeading: {},
                               trailingLabel: "Save", trailingEnabled: false, onTrailing: {})

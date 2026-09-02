@@ -14,7 +14,7 @@
 ///   `WKSectionHeader`, `WKScreenHeader`, `WKFooterActions`, `WKAmbientBackground`,
 ///   `WKArcGauge`, `WKSegmentedToggle`, `WKMetricRow`, `WKStatCard`, `WKConfirmCard`,
 ///   `WKStatChip`, `WKSheetHeader`, `WKSheet`, `WKValueSlider`, `WKFloatingTabBar`,
-///   `WKInsetGroup`, `WKThemePicker`)
+///   `WKInsetGroup`, `WKThemePicker`, `WKPaywall`)
 /// - **Catalog** (`WKCatalogView`) — a gallery for reviewing the system in isolation
 ///
 /// A consuming app drives appearance from its own `WKAppearance` preference —
