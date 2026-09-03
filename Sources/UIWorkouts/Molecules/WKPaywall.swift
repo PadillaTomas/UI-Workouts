@@ -141,30 +141,33 @@ public struct WKPaywall: View {
                 Text(priceLabel)
                     .wkFont(.callout)
                     .foregroundStyle(WKColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, WKSpace.xs)
+
                 WKButton(ctaLabel, style: .primary, size: .regular,
                          isLoading: isPurchasing, action: onPurchase)
-                Button(action: onRestore) {
-                    Text(restoreLabel)
-                        .wkFont(.callout)
-                        .foregroundStyle(WKColor.accent)
-                        .frame(minHeight: WKSize.minTarget)
-                }
-                .buttonStyle(.plain)
-                .disabled(isPurchasing)
 
-                if !legalLinks.isEmpty {
-                    HStack(spacing: WKSpace.xs) {
-                        ForEach(Array(legalLinks.enumerated()), id: \.element.id) { index, link in
-                            if index > 0 {
-                                Text("·").foregroundStyle(WKColor.textTertiary)
-                            }
-                            Link(link.label, destination: link.url)
-                                .foregroundStyle(WKColor.textTertiary)
-                        }
+                // One quiet row: Restore on the left, legal links on the right.
+                HStack(spacing: WKSpace.sm) {
+                    Button(action: onRestore) {
+                        Text(restoreLabel)
                     }
-                    .wkFont(.caption)
+                    .buttonStyle(.plain)
+                    .disabled(isPurchasing)
+
+                    Spacer(minLength: WKSpace.sm)
+
+                    ForEach(Array(legalLinks.enumerated()), id: \.element.id) { index, link in
+                        if index > 0 {
+                            Text("·").foregroundStyle(WKColor.textTertiary)
+                        }
+                        Link(link.label, destination: link.url)
+                    }
                 }
+                .wkFont(.callout)
+                .foregroundStyle(WKColor.textSecondary)
+                .frame(minHeight: WKSize.minTarget)
             }
             .padding(.horizontal, WKSpace.lg)
             .padding(.top, WKSpace.lg)
@@ -196,10 +199,9 @@ public struct WKPaywall: View {
         ],
         priceLabel: "$3.99 · one-time, yours forever",
         ctaLabel: "Unlock Rounds Pro",
-        restoreLabel: "Restore Purchase",
+        restoreLabel: "Restore Purchases",
         legalLinks: [
-            .init("Terms of Use", URL(string: "https://example.com/terms")!),
-            .init("Privacy Policy", URL(string: "https://example.com/privacy")!),
+            .init("Terms & Privacy", URL(string: "https://example.com/legal")!),
         ],
         onPurchase: {},
         onRestore: {}
