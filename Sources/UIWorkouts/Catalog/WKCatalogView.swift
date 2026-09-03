@@ -110,6 +110,10 @@ public struct WKCatalogContent: View {
                     priceLabel: "$3.99 · one-time, yours forever",
                     ctaLabel: "Unlock Rounds Pro",
                     restoreLabel: "Restore Purchase",
+                    legalLinks: [
+                        .init("Terms of Use", URL(string: "https://example.com/terms")!),
+                        .init("Privacy Policy", URL(string: "https://example.com/privacy")!),
+                    ],
                     onPurchase: {}, onRestore: {}, onClose: {}
                 )
                 .frame(height: 520)

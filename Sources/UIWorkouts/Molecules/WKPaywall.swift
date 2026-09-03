@@ -24,12 +24,26 @@ public struct WKPaywall: View {
         }
     }
 
+    /// A small link under the footer — Terms, Privacy Policy, etc. Opens the URL
+    /// in the browser.
+    public struct LegalLink: Identifiable {
+        public let id = UUID()
+        public let label: String
+        public let url: URL
+
+        public init(_ label: String, _ url: URL) {
+            self.label = label
+            self.url = url
+        }
+    }
+
     private let title: String
     private let subtitle: String?
     private let features: [Feature]
     private let priceLabel: String
     private let ctaLabel: String
     private let restoreLabel: String
+    private let legalLinks: [LegalLink]
     private let isPurchasing: Bool
     private let onPurchase: () -> Void
     private let onRestore: () -> Void
@@ -42,6 +56,7 @@ public struct WKPaywall: View {
         priceLabel: String,
         ctaLabel: String,
         restoreLabel: String,
+        legalLinks: [LegalLink] = [],
         isPurchasing: Bool = false,
         onPurchase: @escaping () -> Void,
         onRestore: @escaping () -> Void,
@@ -53,6 +68,7 @@ public struct WKPaywall: View {
         self.priceLabel = priceLabel
         self.ctaLabel = ctaLabel
         self.restoreLabel = restoreLabel
+        self.legalLinks = legalLinks
         self.isPurchasing = isPurchasing
         self.onPurchase = onPurchase
         self.onRestore = onRestore
@@ -136,6 +152,19 @@ public struct WKPaywall: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(isPurchasing)
+
+                if !legalLinks.isEmpty {
+                    HStack(spacing: WKSpace.xs) {
+                        ForEach(Array(legalLinks.enumerated()), id: \.element.id) { index, link in
+                            if index > 0 {
+                                Text("·").foregroundStyle(WKColor.textTertiary)
+                            }
+                            Link(link.label, destination: link.url)
+                                .foregroundStyle(WKColor.textTertiary)
+                        }
+                    }
+                    .wkFont(.caption)
+                }
             }
             .padding(.horizontal, WKSpace.lg)
             .padding(.top, WKSpace.lg)
@@ -168,6 +197,10 @@ public struct WKPaywall: View {
         priceLabel: "$3.99 · one-time, yours forever",
         ctaLabel: "Unlock Rounds Pro",
         restoreLabel: "Restore Purchase",
+        legalLinks: [
+            .init("Terms of Use", URL(string: "https://example.com/terms")!),
+            .init("Privacy Policy", URL(string: "https://example.com/privacy")!),
+        ],
         onPurchase: {},
         onRestore: {}
     )
