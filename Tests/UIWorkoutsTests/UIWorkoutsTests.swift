@@ -19,6 +19,50 @@ struct WKTimeFormatTests {
         #expect(WKTimeFormat.spoken(60) == "1 minute")
         #expect(WKTimeFormat.spoken(125) == "2 minutes 5 seconds")
     }
+
+    /// Independently re-derives what a locale's own date/time symbols render as,
+    /// so the assertions don't depend on hand-typed literals — Foundation uses
+    /// U+202F (narrow no-break space) before AM/PM, not a plain space, which a
+    /// hardcoded `"11:09 AM"` string would silently fail to match.
+    private func rawParts(_ date: Date, showsWeekday: Bool, locale: Locale, timeZone: TimeZone) -> (date: String, time: String) {
+        var dateStyle = Date.FormatStyle(date: .omitted, time: .omitted, locale: locale, timeZone: timeZone)
+            .month(.abbreviated).day()
+        if showsWeekday { dateStyle = dateStyle.weekday(.abbreviated) }
+        let timeStyle = Date.FormatStyle(date: .omitted, time: .omitted, locale: locale, timeZone: timeZone)
+            .hour().minute()
+        return (date.formatted(dateStyle), date.formatted(timeStyle))
+    }
+
+    @Test("calendarDate capitalizes weekday and month in a locale that lowercases them")
+    func calendarDateCapitalizesLowercaseLocales() {
+        let date = Date(timeIntervalSince1970: 1_757_070_540) // 2025-09-05 11:09 UTC
+        let locale = Locale(identifier: "es_ES")
+        let tz = TimeZone(identifier: "UTC")!
+
+        let (rawDate, time) = rawParts(date, showsWeekday: true, locale: locale, timeZone: tz)
+        // Confirm the premise: Spanish really does lowercase both words, so the
+        // test would fail if Foundation ever changed that, not pass for a
+        // hollow reason.
+        #expect(rawDate == "vie, 5 sept")
+        #expect(WKTimeFormat.calendarDate(date, locale: locale, timeZone: tz) == "Vie, 5 Sept, \(time)")
+
+        let (rawDateNoWeekday, time2) = rawParts(date, showsWeekday: false, locale: locale, timeZone: tz)
+        #expect(rawDateNoWeekday == "5 sept")
+        #expect(WKTimeFormat.calendarDate(date, showsWeekday: false, locale: locale, timeZone: tz) == "5 Sept, \(time2)")
+    }
+
+    @Test("calendarDate leaves an already-capitalized locale untouched, AM/PM included")
+    func calendarDateLeavesEnglishUntouched() {
+        let date = Date(timeIntervalSince1970: 1_757_070_540)
+        let locale = Locale(identifier: "en_US")
+        let tz = TimeZone(identifier: "UTC")!
+
+        let (rawDate, time) = rawParts(date, showsWeekday: true, locale: locale, timeZone: tz)
+        #expect(WKTimeFormat.calendarDate(date, locale: locale, timeZone: tz) == "\(rawDate), \(time)")
+
+        let (rawDateNoWeekday, time2) = rawParts(date, showsWeekday: false, locale: locale, timeZone: tz)
+        #expect(WKTimeFormat.calendarDate(date, showsWeekday: false, locale: locale, timeZone: tz) == "\(rawDateNoWeekday), \(time2)")
+    }
 }
 
 @Suite("WKSegmentedTrack weights")
