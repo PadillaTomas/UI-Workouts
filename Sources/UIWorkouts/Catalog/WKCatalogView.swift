@@ -59,6 +59,9 @@ public struct WKCatalogContent: View {
                            bounds: ("0", "100"),
                            segments: [.init(fraction: 1, color: WKRamp.stops[1])])
                     .frame(maxWidth: .infinity)
+                WKArcGauge(value: 6, in: 1...10, caption: "EFFORT",
+                           tint: WKRamp.stop(at: 5.0 / 9.0))
+                    .frame(maxWidth: .infinity)
             }
             group("Theme picker") {
                 WKThemePicker(selection: $appearance)
@@ -155,6 +158,15 @@ public struct WKCatalogContent: View {
                              footer: "Tones play at each interval change.") {
                     WKToggleRow("Interval tones", isOn: $insetTones)
                     WKNavRow("Countdown", value: "3 seconds") {}
+                }
+            }
+            group("Share link") {
+                WKShareLink(image: Image(systemName: "figure.boxing"),
+                            previewTitle: "My workout", label: "Share workout")
+                HStack {
+                    WKShareLink(image: Image(systemName: "figure.boxing"),
+                                previewTitle: "My workout")
+                    Spacer()
                 }
             }
             group("Buttons") {

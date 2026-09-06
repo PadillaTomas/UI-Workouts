@@ -8,6 +8,11 @@ import SwiftUI
 /// The default `sweep` is a clean 180° semicircle: the track starts on the
 /// horizontal, runs over the top and ends on the horizontal, and `fraction == 1`
 /// fills exactly that arc.
+///
+/// Two ways in: `fraction:` + `value:` for a free 0…1 progress read, or
+/// `value:in:` for an integer scale — the latter derives the fill so the range's
+/// low end sits on the left tip and the high end on the right, and labels the
+/// tips with the bounds.
 public struct WKArcGauge: View {
     public struct Segment {
         public let fraction: Double
@@ -52,6 +57,38 @@ public struct WKArcGauge: View {
         self.showsKnob = showsKnob
     }
 
+    /// Convenience for an **integer scale** — a value on a `min…max` range. The
+    /// fill is derived so `min` sits on the left tip and `max` on the right, the
+    /// tip labels are the range bounds, and the centred value is the number.
+    /// Values outside the range clamp.
+    ///
+    ///     WKArcGauge(value: 6, in: 1...10, caption: "EFFORT")
+    public init(
+        value: Int,
+        in range: ClosedRange<Int>,
+        caption: String? = nil,
+        showsBounds: Bool = true,
+        sweep: Angle = .degrees(180),
+        diameter: CGFloat = WKSize.gaugeDiameter,
+        segments: [Segment] = [],
+        tint: Color = WKColor.textPrimary,
+        showsKnob: Bool = true
+    ) {
+        let span = Double(max(1, range.upperBound - range.lowerBound))
+        let clamped = min(range.upperBound, max(range.lowerBound, value))
+        self.init(
+            fraction: Double(clamped - range.lowerBound) / span,
+            value: "\(clamped)",
+            caption: caption,
+            bounds: showsBounds ? ("\(range.lowerBound)", "\(range.upperBound)") : nil,
+            sweep: sweep,
+            diameter: diameter,
+            segments: segments,
+            tint: tint,
+            showsKnob: showsKnob
+        )
+    }
+
     private let lineWidth: CGFloat = 12
 
     /// Radius of the arc's circle. The circle is centred horizontally and its
@@ -69,73 +106,86 @@ public struct WKArcGauge: View {
         return max(0, CGFloat(sin(angle(at: 1) * .pi / 180))) * radius
     }
 
+    /// Vertical gap from an arc tip down to its min/max label — clears the knob
+    /// (which sits on the tip at fraction 0 or 1) and reads as "below the tip".
+    private let boundLabelDrop: CGFloat = WKSpace.xl
+
     private var regionHeight: CGFloat {
-        centerY + lineWidth / 2 + max(bottomDip, diameter * 0.14)
+        let arc = centerY + lineWidth / 2 + max(bottomDip, diameter * 0.14)
+        guard bounds != nil else { return arc }
+        return max(arc, point(at: 0).y + boundLabelDrop + 14)
     }
 
     public var body: some View {
-        VStack(spacing: WKSpace.xs) {
-            ZStack {
-                Arc(sweepDeg: sweepDeg, from: 0, to: 1, lineWidth: lineWidth)
-                    .stroke(WKColor.border,
+        ZStack {
+            Arc(sweepDeg: sweepDeg, from: 0, to: 1, lineWidth: lineWidth)
+                .stroke(WKColor.border,
+                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+
+            ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+                Arc(sweepDeg: sweepDeg, from: 0, to: segment.fraction, lineWidth: lineWidth)
+                    .stroke(segment.color.opacity(0.35),
                             style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-
-                ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
-                    Arc(sweepDeg: sweepDeg, from: 0, to: segment.fraction, lineWidth: lineWidth)
-                        .stroke(segment.color.opacity(0.35),
-                                style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                        .accessibilityHidden(true)
-                }
-
-                Arc(sweepDeg: sweepDeg, from: 0, to: fraction, lineWidth: lineWidth)
-                    .stroke(tint, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-
-                if showsKnob {
-                    Circle()
-                        .fill(WKColor.surfaceRaised)
-                        .overlay(Circle().strokeBorder(tint, lineWidth: 3))
-                        .frame(width: lineWidth + 6, height: lineWidth + 6)
-                        .position(knobPoint)
-                        .accessibilityHidden(true)
-                }
-
-                VStack(spacing: WKSpace.xs) {
-                    if let caption {
-                        Text(caption)
-                            .wkFont(.labelMono)
-                            .foregroundStyle(WKColor.textTertiary)
-                    }
-                    Text(value)
-                        .wkFont(.metricXL)
-                        .foregroundStyle(WKColor.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                }
-                .frame(width: diameter * 0.8)
-                .position(x: diameter / 2, y: centerY - radius * 0.18)
+                    .accessibilityHidden(true)
             }
-            .frame(width: diameter, height: regionHeight)
+
+            Arc(sweepDeg: sweepDeg, from: 0, to: fraction, lineWidth: lineWidth)
+                .stroke(tint, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+
+            if showsKnob {
+                Circle()
+                    .fill(WKColor.surfaceRaised)
+                    .overlay(Circle().strokeBorder(tint, lineWidth: 3))
+                    .frame(width: lineWidth + 6, height: lineWidth + 6)
+                    .position(knobPoint)
+                    .accessibilityHidden(true)
+            }
 
             if let bounds {
-                HStack {
-                    Text(bounds.0)
-                    Spacer()
-                    Text(bounds.1)
-                }
-                .wkFont(.caption)
-                .foregroundStyle(WKColor.textTertiary)
-                .frame(width: diameter)
-                .padding(.horizontal, lineWidth / 2)
+                boundLabel(bounds.0, at: 0)
+                boundLabel(bounds.1, at: 1)
             }
+
+            VStack(spacing: WKSpace.xs) {
+                if let caption {
+                    Text(caption)
+                        .wkFont(.labelMono)
+                        .foregroundStyle(WKColor.textTertiary)
+                }
+                Text(value)
+                    .wkFont(.metricXL)
+                    .foregroundStyle(WKColor.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(width: diameter * 0.8)
+            .position(x: diameter / 2, y: centerY - radius * 0.18)
         }
+        .frame(width: diameter, height: regionHeight)
         .animation(reduceMotion ? nil : WKMotion.calm, value: fraction)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(caption ?? "Progress")
         .accessibilityValue(accessibleValue)
     }
 
-    private var knobPoint: CGPoint {
-        let a = angle(at: fraction) * .pi / 180
+    /// A min/max label sat at the outer edge below its arc tip — close enough to
+    /// read as part of the gauge, low enough to clear the knob.
+    private func boundLabel(_ text: String, at f: Double) -> some View {
+        let tip = point(at: f)
+        let edgeX: CGFloat = f < 0.5 ? WKSpace.sm : diameter - WKSpace.sm
+        return Text(text)
+            .wkFont(.caption)
+            .foregroundStyle(WKColor.textTertiary)
+            .fixedSize()
+            .position(x: edgeX, y: tip.y + boundLabelDrop)
+            .accessibilityHidden(true)
+    }
+
+    private var knobPoint: CGPoint { point(at: fraction) }
+
+    /// Point on the arc's centre-line circle at fraction `f` of the sweep.
+    private func point(at f: Double) -> CGPoint {
+        let a = angle(at: f) * .pi / 180
         return CGPoint(
             x: diameter / 2 + CGFloat(cos(a)) * radius,
             y: centerY + CGFloat(sin(a)) * radius
@@ -181,8 +231,8 @@ public struct WKArcGauge: View {
             bounds: ("0", "100"),
             segments: [.init(fraction: 1, color: WKRamp.stops[1])]
         )
-        WKArcGauge(fraction: 0.4, value: "8", caption: "WEEK", bounds: ("1", "20"),
-                   sweep: .degrees(240), showsKnob: false)
+        WKArcGauge(value: 6, in: 1...10, caption: "EFFORT",
+                   tint: WKRamp.stop(at: 5.0 / 9.0))
     }
     .padding(WKSpace.xl)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
